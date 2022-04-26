@@ -21,4 +21,4 @@ If running in Docker or Kubernetes, set up a volume at `/db` to persist data.
 ## Development
 
 Create a `.env` file with your configuration, at the bare minimum you need
-An address to watch and a Discord webhook. Run it with `go run main.go`
+an address to watch and a Discord webhook. Run it with `go run main.go`
