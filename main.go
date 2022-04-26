@@ -18,7 +18,7 @@ import (
 	cfg "github.com/golobby/config/v3"
 	"github.com/golobby/config/v3/pkg/feeder"
 	log "github.com/sirupsen/logrus"
-	btcrpc "github.com/tyzbit/go-btc-rpc-explorer-api"
+	"github.com/tyzbit/btcapi"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -60,10 +60,10 @@ New Balance: {{ .BalanceSat }}
 	watcher    WatcherConfig
 )
 
-// WatchAddress takes a btcrpc config and an address. It checks the database
+// WatchAddress takes a btcapi config and an address. It checks the database
 // for a previous address summary and compares the previous balance to the
 // current balance. If they are different, it calls WatcherConfig.NotifyHandler
-func (w WatcherConfig) WatchAddress(c btcrpc.Config, address string) {
+func (w WatcherConfig) WatchAddress(c btcapi.Config, address string) {
 	for {
 		var oldAddressInfo AddressInfo
 		w.DB.Model(&AddressInfo{}).
@@ -206,13 +206,13 @@ func main() {
 	}
 
 	// Set up BTC-RPC
-	btcrpc := btcrpc.Config{
+	btcapi := btcapi.Config{
 		APIEndpoint: watcher.BTCRPCAPI,
 	}
 
 	// Check balance of each address
 	for _, address := range watcher.Addresses {
-		go watcher.WatchAddress(btcrpc, address)
+		go watcher.WatchAddress(btcapi, address)
 	}
 
 	log.Info("watching ", len(watcher.Addresses), " addresses")
