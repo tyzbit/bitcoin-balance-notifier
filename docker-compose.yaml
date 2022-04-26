@@ -1,0 +1,15 @@
+version: "3.9"
+    
+services:    
+  bitcoin-balance-notifier:
+    build: .
+    restart: always
+    volumes:
+      - db:/db
+    environment:
+      ADDRESSES: 34rng4QwB5pHUbGDJw1JxjLwgEU8TQuEqv
+      DISCORD_WEBHOOK: ${DISCORD_WEBHOOK}
+      INTERVAL: "10"
+      LOG_LEVEL: debug
+volumes:
+  db: {}
