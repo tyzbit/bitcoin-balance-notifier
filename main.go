@@ -207,7 +207,7 @@ func main() {
 
 	// Set up BTC-RPC
 	btcapi := btcapi.Config{
-		APIEndpoint: watcher.BTCRPCAPI,
+		ExplorerURL: watcher.BTCRPCAPI,
 	}
 
 	// Check balance of each address

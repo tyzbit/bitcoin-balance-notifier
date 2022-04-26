@@ -28,6 +28,8 @@ github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5Cc
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/tyzbit/btcapi v0.3.0 h1:Jv4i6y0ba3IZesDRuiqpSgFaktsV9Yjf+OO63u9CsLA=
 github.com/tyzbit/btcapi v0.3.0/go.mod h1:hU/nXDArmULgj3lAjQdK+eMY3F5HlsWN+MAoGszp9RY=
+github.com/tyzbit/btcapi v0.4.0 h1:3XZksHhqPCr7Z/kLd9fTikHvVTXO1iH3hzC+IBnZLvo=
+github.com/tyzbit/btcapi v0.4.0/go.mod h1:hU/nXDArmULgj3lAjQdK+eMY3F5HlsWN+MAoGszp9RY=
 golang.org/x/sys v0.0.0-20191026070338-33540a1f6037/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20220422013727-9388b58f7150 h1:xHms4gcpe1YE7A3yIllJXP16CMAGuqwO2lX1mTyyRRc=
 golang.org/x/sys v0.0.0-20220422013727-9388b58f7150/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
