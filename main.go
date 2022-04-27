@@ -235,8 +235,8 @@ func (w WatcherConfig) WatchPubkey(c btcapi.Config, nickPubkey string) {
 				if err != nil {
 					log.Errorf("error calling btcapi: %v", err)
 				}
+				pubkeyTxCount := 0
 				for _, address := range pubKeyPage.ReceiveAddresses {
-					previousTxCount := totalPubkeyTxCount
 					addressSummary, err := c.AddressSummary(address)
 					if err != nil {
 						log.Errorf("error calling btcapi: %v", err)
@@ -244,12 +244,13 @@ func (w WatcherConfig) WatchPubkey(c btcapi.Config, nickPubkey string) {
 					}
 					totalPubkeyBalance = totalPubkeyBalance + addressSummary.TXHistory.BalanceSat
 					totalPubkeyTxCount = totalPubkeyTxCount + addressSummary.TXHistory.TXCount
-					if previousTxCount == totalPubkeyTxCount {
+					if pubkeyTxCount == addressSummary.TXHistory.TXCount {
 						if NoTXCount > w.Lookahead {
 							break pubkey
 						}
 						NoTXCount++
 					}
+					pubkeyTxCount = addressSummary.TXHistory.TXCount
 				}
 			}
 			totalBalance = totalBalance + totalPubkeyBalance
