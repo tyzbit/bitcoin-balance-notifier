@@ -79,6 +79,7 @@ var (
 Nickname: {{ .Nickname }}
 Address: {{ .Address }}
 Previous Balance (satoshis): {{ .PreviousBalanceSat }}
+Previous Balance ({{ .Currency }}): {{ .PreviousBalanceFiat }}
 Transactions: {{ .TXCount }}
 New Balance (satoshis): {{ .BalanceSat }}
 New Balance ({{ .Currency }}): {{ .BalanceFiat }}
@@ -87,6 +88,7 @@ New Balance ({{ .Currency }}): {{ .BalanceFiat }}
 Nickname: {{ .Nickname }}
 Address: {{ .Pubkey }}
 Previous Balance (satoshis): {{ .PreviousBalanceSat }}
+Previous Balance ({{ .Currency }}): {{ .PreviousBalanceFiat }}
 Transactions: {{ .TXCount }}
 New Balance (satoshis): {{ .BalanceSat }}
 New Balance ({{ .Currency }}): {{ .BalanceFiat }}
