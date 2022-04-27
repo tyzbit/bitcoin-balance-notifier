@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/golobby/config/v3 v3.3.4
 	github.com/sirupsen/logrus v1.8.1
-	github.com/tyzbit/btcapi v0.4.0
+	github.com/tyzbit/btcapi v0.5.3
 	gorm.io/driver/sqlite v1.3.2
 	gorm.io/gorm v1.23.4
 )
