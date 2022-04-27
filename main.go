@@ -66,7 +66,7 @@ type DiscordPayload struct {
 }
 
 const (
-	DefaultApi     string = "https://bitcoinexplorer.org/"
+	DefaultApi     string = "https://bitcoinexplorer.org"
 	SatsPerBitcoin int    = 100000000
 )
 
