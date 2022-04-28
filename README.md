@@ -7,7 +7,7 @@ Supports addresses and Extended Pubkeys.
 Set some environment variables before launching, or add a `.env` file.
 
 | Variable | Value(s) | Required |
-|:-|:-|
+|:-|-|-|
 | ADDRESSES | A comma separated list of `nickname:address` to watch (example: `Test Address:34rng4QwB5pHUbGDJw1JxjLwgEU8TQuEqv`) | Yes, if `PUBKEYS` is empty |
 | BTC_RPC_API | (optional) The URL to an instance of BTC-RPC-Explorer. Default: `https://bitcoinexplorer.org` | No, but encouraged |
 | CHECK_ALL_PUBKEY_TYPES | Whether or not to check the other types of a given pubkey (xpub, ypub, zpub) | No |
