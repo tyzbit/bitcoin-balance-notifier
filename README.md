@@ -11,7 +11,7 @@ Set some environment variables before launching, or add a `.env` file.
 | ADDRESSES | A comma separated list of `nickname:address` to watch (example: `Test Address:34rng4QwB5pHUbGDJw1JxjLwgEU8TQuEqv`) |
 | BTC_RPC_API | (optional) The URL to an instance of BTC-RPC-Explorer. Default: `https://bitcoinexplorer.org` |
 | CHECK_ALL_PUBKEY_TYPES | Whether or not to check the other types of a given pubkey (xpub, ypub, zpub) |
-| CURRENCY | Fiat currency to display balance in |
+| CURRENCY | Fiat currency to display balance in (`USD`,`GBP`,`EUR`,`XAU`) |
 | DISCORD_WEBHOOK | The URL to a Discord Webhook to call when the balance changes |
 | LOG_LEVEL | `trace`, `debug`, `info`, `warn`, `error` |
 | LOOKAHEAD | How many addresses with no activity before we consider a pubkey to be completely scanned. Default: `20` |
