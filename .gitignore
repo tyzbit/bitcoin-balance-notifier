@@ -16,3 +16,4 @@
 
 .env
 local.db
+bitcoin-balance-notifier*
