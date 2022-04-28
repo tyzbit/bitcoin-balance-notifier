@@ -1,0 +1,53 @@
+# github.com/BurntSushi/toml v0.4.1
+## explicit; go 1.16
+github.com/BurntSushi/toml
+github.com/BurntSushi/toml/internal
+# github.com/golobby/cast v1.3.0
+## explicit; go 1.11
+github.com/golobby/cast
+# github.com/golobby/config/v3 v3.3.4
+## explicit; go 1.11
+github.com/golobby/config/v3
+github.com/golobby/config/v3/pkg/feeder
+# github.com/golobby/dotenv v1.3.1
+## explicit; go 1.11
+github.com/golobby/dotenv
+github.com/golobby/dotenv/pkg/decoder
+# github.com/golobby/env/v2 v2.2.0
+## explicit; go 1.11
+github.com/golobby/env/v2
+# github.com/jinzhu/inflection v1.0.0
+## explicit
+github.com/jinzhu/inflection
+# github.com/jinzhu/now v1.1.5
+## explicit; go 1.12
+github.com/jinzhu/now
+# github.com/mattn/go-sqlite3 v1.14.12
+## explicit; go 1.12
+github.com/mattn/go-sqlite3
+# github.com/sirupsen/logrus v1.8.1
+## explicit; go 1.13
+github.com/sirupsen/logrus
+# github.com/tyzbit/btcapi v0.5.6
+## explicit; go 1.18
+github.com/tyzbit/btcapi
+# golang.org/x/sys v0.0.0-20220422013727-9388b58f7150
+## explicit; go 1.17
+golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/unix
+golang.org/x/sys/windows
+# gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+## explicit
+gopkg.in/yaml.v3
+# gorm.io/driver/sqlite v1.3.2
+## explicit; go 1.14
+gorm.io/driver/sqlite
+# gorm.io/gorm v1.23.4
+## explicit; go 1.14
+gorm.io/gorm
+gorm.io/gorm/callbacks
+gorm.io/gorm/clause
+gorm.io/gorm/logger
+gorm.io/gorm/migrator
+gorm.io/gorm/schema
+gorm.io/gorm/utils
