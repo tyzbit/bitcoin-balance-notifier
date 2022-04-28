@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 BUILDCONFIGS=(
   "darwin amd64"
   "darwin arm64"
