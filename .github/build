@@ -9,7 +9,6 @@ BUILDCONFIGS=(
   "windows amd64"
 )
 
-cd ../
 for bc in "${BUILDCONFIGS[@]}"; do
   os=${bc% *}
   arch=${bc#* }
