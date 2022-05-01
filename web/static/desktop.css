@@ -1,0 +1,46 @@
+body {
+  background: #ddd;
+  font-family: system-ui;
+}
+table {
+  width: 50vw;
+}
+select {
+  font-size: 1em;
+}
+.ui {
+  padding: 10px;
+}
+#sidebar {
+ width: 18vw;
+ float: left;
+ height: 90vh;
+ margin-right: 2%;
+}
+#addresses {
+  width: 100%;
+  height: 100%;
+}
+#address-info {
+  width: 50vw;
+  float: left;
+}
+.address-entry {
+  width: 50vw;
+  float: left;
+  word-wrap: anywhere;
+}
+#add-address {
+  width: 20vw;
+  float: right;
+}
+.address-input {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+.nickname-input {
+  display: flex;
+  flex-direction: row;
+  padding-bottom: .2em;
+}

@@ -8,8 +8,10 @@ RUN apk add \
 &&  go build -ldflags="-s -w"
 
 FROM alpine
+ENV GIN_MODE=release
 
 COPY --from=build /bitcoin-balance-notifier /
+COPY web /
 VOLUME [ "/db" ]
 
 CMD ["/bitcoin-balance-notifier"]
