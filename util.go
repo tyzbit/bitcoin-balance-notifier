@@ -101,6 +101,9 @@ func (w Watcher) FillDefaults() {
 	if w.DBPath == "" {
 		watcher.DBPath = DefaultDBPath
 	}
+	if w.Port == "" {
+		watcher.Port = "80"
+	}
 
 	// Set up DB path
 	// Create the folder path if it doesn't exist

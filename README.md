@@ -2,21 +2,29 @@
 Notifies if the balance of a bitcoin address changes. 
 Supports addresses and Extended Pubkeys.
 
+# Usage
+```bash
+docker compose up --build
+```
+
+Then navigate to http://127.0.0.1:8000. If you run the image by itself, it listens on `80` by default.
+
+Prebuilt images are also available: `docker.io/tyzbit/bitcoin-balance-notifier:latest`. You can also replace `latest` with a release version.
+
 ## Configuration
 
 Set some environment variables before launching, or add a `.env` file.
 
 | Variable | Value(s) | Required |
 |:-|-|-|
-| ADDRESSES | A comma separated list of `nickname:address` to watch (example: `Test Address:34rng4QwB5pHUbGDJw1JxjLwgEU8TQuEqv`) | Yes, if `PUBKEYS` is empty |
 | BTC_RPC_API | (optional) The URL to an instance of BTC-RPC-Explorer. Default: `https://bitcoinexplorer.org` | No, but encouraged |
-| CHECK_ALL_PUBKEY_TYPES | Whether or not to check the other types of a given pubkey (xpub, ypub, zpub) | No |
+| CHECK_ALL_PUBKEY_TYPES | Whether or not to check the other types of a given pubkey (xpub, ypub, zpub). Defaults to `false` | No |
 | CURRENCY | Fiat currency to display balance in (`USD`,`GBP`,`EUR`,`XAU`). Defaults to `USD` | No |
 | DISCORD_WEBHOOK | The URL to a Discord Webhook to call when the balance changes | Yes |
 | LOG_LEVEL | `trace`, `debug`, `info`, `warn`, `error` | No |
 | LOOKAHEAD | How many addresses with no activity before we consider a pubkey to be completely scanned. Default: `20` | No |
-| PAGE_SIZE | How many addresses to request at once for PubKey-type addresses Default: `100` | No |
-| PUBKEYS | A comma separated list of `nickname:pubkey` to watch (example: `Test Pubkey:xpub6EuV33a2DXxAhoJTRTnr8qnysu81AA4YHpLY6o8NiGkEJ8KADJ35T64eJsStWsmRf1xXkEANVjXFXnaUKbRtFwuSPCLfDdZwYNZToh4LBCd`) | Yes, if `ADDRESSES` is empty |
+| PAGE_SIZE | How many addresses to request at once for PubKey-type addresses. Default: `100` | No |
+| PORT | What port to listen on. Default: `80` | No |
 | SLEEP_INTERVAL | (optional) The amount of time, in seconds, between checking the balance. Default: `300` (5 minutes) | No |
 
 ## Database

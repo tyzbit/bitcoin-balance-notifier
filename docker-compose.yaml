@@ -6,6 +6,8 @@ services:
     restart: always
     volumes:
       - db:/db
+    ports:
+      - 8000:80
     environment:
       DISCORD_WEBHOOK: ${DISCORD_WEBHOOK}
       INTERVAL: "10"

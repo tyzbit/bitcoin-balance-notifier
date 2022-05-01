@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"reflect"
 	"sync"
 
@@ -27,6 +28,7 @@ type Watcher struct {
 	LogLevel            string `env:"LOG_LEVEL"`
 	Lookahead           int    `env:"LOOKAHEAD"`
 	PageSize            int    `env:"PAGE_SIZE"`
+	Port                string `env:"PORT"`
 }
 
 type DiscordPayload struct {
@@ -114,7 +116,8 @@ func main() {
 	r.Static("/static", "web/static")
 	r.GET("/", watcher.Home)
 
-	err = r.Run(":3000")
+	thing := ":" + fmt.Sprintf(watcher.Port)
+	err = r.Run(thing)
 	if err != nil {
 		log.Fatal("could not start: ", err)
 	}
