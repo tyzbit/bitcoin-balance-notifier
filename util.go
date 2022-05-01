@@ -104,6 +104,9 @@ func (w Watcher) FillDefaults() {
 	if w.Port == "" {
 		watcher.Port = "80"
 	}
+	if w.Currency == "" {
+		watcher.Currency = "USD"
+	}
 
 	// Set up DB path
 	// Create the folder path if it doesn't exist

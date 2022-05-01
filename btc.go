@@ -17,6 +17,8 @@ func (w Watcher) ConvertBalance(balanceSat int) (float64, error) {
 	currency := strings.ToUpper(w.Currency)
 	bitcoinBalance := float64(balanceSat) / float64(SatsPerBitcoin)
 	switch currency {
+	case "USD":
+		balanceFiat = price.USD * bitcoinBalance
 	case "EUR":
 		balanceFiat = price.EUR * bitcoinBalance
 	case "GBP":

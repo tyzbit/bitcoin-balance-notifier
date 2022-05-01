@@ -116,8 +116,7 @@ func main() {
 	r.Static("/static", "web/static")
 	r.GET("/", watcher.Home)
 
-	thing := ":" + fmt.Sprintf(watcher.Port)
-	err = r.Run(thing)
+	err = r.Run(":" + fmt.Sprintf(watcher.Port))
 	if err != nil {
 		log.Fatal("could not start: ", err)
 	}
