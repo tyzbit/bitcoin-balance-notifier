@@ -191,7 +191,7 @@ func (w Watcher) GetBalances(c *gin.Context) {
 func (w Watcher) GetWatches(c *gin.Context) {
 	status := http.StatusOK
 	response := GetWatchesResponse{}
-	for id, _ := range w.CancelSignals {
+	for id := range w.CancelSignals {
 		response = append(response, Watches{
 			Identifier: id,
 			Nickname:   w.GetNickname(id),

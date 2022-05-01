@@ -12,10 +12,10 @@ select {
   padding: 10px;
 }
 #sidebar {
- width: 18vw;
- float: left;
- height: 90vh;
- margin-right: 2%;
+  width: 18vw;
+  float: left;
+  height: 90vh;
+  margin-right: 2%;
 }
 #addresses {
   width: 100%;
@@ -42,5 +42,5 @@ select {
 .nickname-input {
   display: flex;
   flex-direction: row;
-  padding-bottom: .2em;
+  padding-bottom: 0.2em;
 }
