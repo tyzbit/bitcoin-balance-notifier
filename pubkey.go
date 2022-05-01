@@ -219,6 +219,7 @@ func (w Watcher) UpdatePubkeysTotal(address string, totalPubkeyBalance *int, tot
 	return addressSummary, nil
 }
 
+// GetPubkeyInfo gets a PubkeyInfo object from the database with a pubkey
 func (w Watcher) GetPubkeyInfo(pubkey string) (pubkeyInfo PubkeyInfo) {
 	w.DB.Model(&PubkeyInfo{}).
 		Where(&PubkeyInfo{Pubkey: pubkey}).
@@ -226,6 +227,7 @@ func (w Watcher) GetPubkeyInfo(pubkey string) (pubkeyInfo PubkeyInfo) {
 	return pubkeyInfo
 }
 
+// DeletePubkeyInfo deletes a PubkeyInfo object from the database with a pubkey
 func (w Watcher) DeletePubkeyInfo(pubkey string) bool {
 	tx := w.DB.Model(&PubkeyInfo{}).
 		Where(&PubkeyInfo{Pubkey: pubkey}).

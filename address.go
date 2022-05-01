@@ -137,6 +137,7 @@ func (w Watcher) CreateNewAddressInfo(address string, nickname string) (AddressI
 	return addressInfo, nil
 }
 
+// Gets an AddressInfo object from the database with an address
 func (w Watcher) GetAddressInfo(address string) (addressInfo AddressInfo) {
 	w.DB.Model(&AddressInfo{}).
 		Where(&AddressInfo{Address: address}).
@@ -144,6 +145,7 @@ func (w Watcher) GetAddressInfo(address string) (addressInfo AddressInfo) {
 	return addressInfo
 }
 
+// Deletes an AddressInfo object from the database with an address
 func (w Watcher) DeleteAddressInfo(address string) bool {
 	tx := w.DB.Model(&AddressInfo{}).
 		Where(&AddressInfo{Address: address}).

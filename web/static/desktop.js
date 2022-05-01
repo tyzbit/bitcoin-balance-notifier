@@ -65,9 +65,10 @@ $(document).ready(function(){
         message = "Success"
         if (data.responseJSON != null && data.responseJSON.errors) {
           message = data.responseJSON.errors
+        } else {
+          refreshAddresses()
         }
         $("#add-status").html(message).css('opacity', '100%')
-        refreshAddresses()
         $("#add-status").delay(2000).animate({opacity: "40%"})
       })
   })
