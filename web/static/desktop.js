@@ -10,7 +10,7 @@ $(document).ready(function () {
         for (let i = 0; i < data.addresses.length; i++) {
           options =
             options +
-            `<option value="${data.addresses[i].Address}">${data.addresses[i].Nickname}" (address)</option>`;
+            `<option value="${data.addresses[i].Address}">${data.addresses[i].Nickname} (address)</option>`;
         }
       }
       if (data.pubkeys) {
