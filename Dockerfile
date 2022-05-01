@@ -1,6 +1,6 @@
 FROM golang:1.18-alpine as build
-WORKDIR /
-COPY . ./
+WORKDIR /app/
+COPY . /app/
 
 RUN apk add \
     build-base \
@@ -10,7 +10,7 @@ RUN apk add \
 FROM alpine
 ENV GIN_MODE=release
 
-COPY --from=build /bitcoin-balance-notifier /
+COPY --from=build /app/bitcoin-balance-notifier /
 VOLUME [ "/db" ]
 
 CMD ["/bitcoin-balance-notifier"]
