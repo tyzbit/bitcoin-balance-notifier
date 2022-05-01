@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	"reflect"
 	"sync"
@@ -50,6 +51,8 @@ var (
 		&PubkeyInfo{},
 	}
 	watcher Watcher
+	//go:embed web
+	web embed.FS
 )
 
 func init() {
@@ -67,8 +70,7 @@ func main() {
 	watcher.DB = db
 
 	for _, schemaType := range allSchemaTypes {
-		err := watcher.DB.AutoMigrate(schemaType)
-		if err != nil {
+		if err := watcher.DB.AutoMigrate(schemaType); err != nil {
 			log.Fatal("unable to automigrate ", reflect.TypeOf(&schemaType).Elem().Name(), "err: ", err)
 		}
 	}
@@ -78,46 +80,12 @@ func main() {
 		ExplorerURL: watcher.BTCAPIEndpoint,
 	}
 
-	watcher.CancelWaitGroup = &sync.WaitGroup{}
-	// Check balance of each address
-	addresses := []AddressInfo{}
-	watcher.DB.Model(&AddressInfo{}).Scan(&addresses)
-	watcher.CancelSignals = map[string]chan bool{}
-	for _, address := range addresses {
-		cancel := make(chan bool, 1)
-		watcher.CancelWaitGroup.Add(1)
-		watcher.AddCancelSignal(address.Address, cancel)
-		go watcher.WatchAddress(cancel, address.Address)
-	}
-
-	// Check balance of each key of each pubkey
-	pubkeys := []PubkeyInfo{}
-	watcher.DB.Model(&PubkeyInfo{}).Scan(&pubkeys)
-	for _, pubkey := range pubkeys {
-		cancel := make(chan bool, 1)
-		watcher.CancelWaitGroup.Add(1)
-		watcher.AddCancelSignal(pubkey.Pubkey, cancel)
-		go watcher.WatchPubkey(cancel, pubkey.Pubkey)
-	}
-
-	log.Infof("watching %d addresses and %d pubkeys", len(addresses), len(pubkeys))
-
+	StartWatches()
 	r := gin.Default()
+	InitFrontend(r)
+	InitBackend(r)
 
-	// Backend
-	r.POST("/balance", watcher.GetBalance)
-	r.POST("/watch", watcher.AddWatch)
-	r.GET("/balances", watcher.GetBalances)
-	r.GET("/watches", watcher.GetWatches)
-	r.DELETE("/identifier", watcher.DeleteIdentifier)
-
-	// Frontend
-	r.LoadHTMLGlob("web/templates/**/*")
-	r.Static("/static", "web/static")
-	r.GET("/", watcher.Home)
-
-	err = r.Run(":" + fmt.Sprintf(watcher.Port))
-	if err != nil {
+	if err := r.Run(":" + fmt.Sprintf(watcher.Port)); err != nil {
 		log.Fatal("could not start: ", err)
 	}
 }

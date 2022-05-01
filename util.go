@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"text/template"
 
 	cfg "github.com/golobby/config/v3"
@@ -26,27 +27,10 @@ type Info interface {
 
 // UpdateInfo calls Update() for the provided Info interface
 func (w Watcher) UpdateInfo(i Info) {
-	err := i.Update(w)
-	if err != nil {
+	if err := i.Update(w); err != nil {
 		log.Errorf("error updating address info for \"%s\" (%s): %v",
 			i.GetNickname(), i.GetIdentifier(), err)
 	}
-}
-
-// AddCancelSignal adds a cancel channel to w.CancelSignals
-func (w Watcher) AddCancelSignal(i string, c chan bool) {
-	w.CancelSignals[i] = c
-	w.CancelWaitGroup.Done()
-}
-
-// DeleteCancelSignal deletes the cancel channel on w.CancelSignals
-func (w Watcher) DeleteCancelSignal(i string) {
-	// Only send to the channel if it's open and buffered
-	if w.CancelSignals[i] != make(chan bool, 1) {
-		w.CancelSignals[i] <- true
-	}
-	delete(w.CancelSignals, i)
-	w.CancelWaitGroup.Done()
 }
 
 // InitLogging sets up logging
@@ -110,14 +94,56 @@ func (w Watcher) FillDefaults() {
 
 	// Set up DB path
 	// Create the folder path if it doesn't exist
-	_, err := os.Stat(watcher.DBPath)
-	if errors.Is(err, fs.ErrNotExist) {
+	if _, err := os.Stat(watcher.DBPath); errors.Is(err, fs.ErrNotExist) {
 		dirPath := filepath.Dir(watcher.DBPath)
 		if err := os.MkdirAll(dirPath, 0660); err != nil {
 			log.Warn("unable to make directory path ", dirPath, " err: ", err)
 			watcher.DBPath = "./local.db"
 		}
 	}
+}
+
+func StartWatches() {
+	watcher.CancelWaitGroup = &sync.WaitGroup{}
+	// Check balance of each address
+	addresses := []AddressInfo{}
+	watcher.DB.Model(&AddressInfo{}).Scan(&addresses)
+	watcher.CancelSignals = map[string]chan bool{}
+	for _, address := range addresses {
+		// This channel is used to send a signal to stop watching the address
+		cancel := make(chan bool, 1)
+		watcher.CancelWaitGroup.Add(1)
+		watcher.AddCancelSignal(address.Address, cancel)
+		go watcher.WatchAddress(cancel, address.Address)
+	}
+
+	// Check balance of each key of each pubkey
+	pubkeys := []PubkeyInfo{}
+	watcher.DB.Model(&PubkeyInfo{}).Scan(&pubkeys)
+	for _, pubkey := range pubkeys {
+		// This channel is used to send a signal to stop watching the pubkey
+		cancel := make(chan bool, 1)
+		watcher.CancelWaitGroup.Add(1)
+		watcher.AddCancelSignal(pubkey.Pubkey, cancel)
+		go watcher.WatchPubkey(cancel, pubkey.Pubkey)
+	}
+	log.Infof("watching %d addresses and %d pubkeys", len(addresses), len(pubkeys))
+}
+
+// AddCancelSignal adds a cancel channel to w.CancelSignals
+func (w Watcher) AddCancelSignal(i string, c chan bool) {
+	w.CancelSignals[i] = c
+	w.CancelWaitGroup.Done()
+}
+
+// DeleteCancelSignal deletes the cancel channel on w.CancelSignals
+func (w Watcher) DeleteCancelSignal(i string) {
+	// Only send to the channel if it's open and buffered
+	if w.CancelSignals[i] != make(chan bool, 1) {
+		w.CancelSignals[i] <- true
+	}
+	delete(w.CancelSignals, i)
+	w.CancelWaitGroup.Done()
 }
 
 // SendNotification sends a message filled with values from a template

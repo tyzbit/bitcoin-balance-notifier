@@ -66,8 +66,7 @@ func (w Watcher) AddWatch(c *gin.Context) {
 	status := http.StatusCreated
 	body, _ := ioutil.ReadAll(c.Request.Body)
 	var req AddWatchPOST
-	err := json.Unmarshal(body, &req)
-	if err != nil {
+	if err := json.Unmarshal(body, &req); err != nil {
 		c.JSON(http.StatusInternalServerError, BalanceResponse{
 			Errors: fmt.Sprint(err),
 		})
@@ -87,8 +86,7 @@ func (w Watcher) AddWatch(c *gin.Context) {
 			c.JSON(status, response)
 			return
 		}
-		_, err = w.CreateNewPubkeyInfo(req.Identifier, req.Nickname)
-		if err != nil {
+		if _, err := w.CreateNewPubkeyInfo(req.Identifier, req.Nickname); err != nil {
 			status = http.StatusConflict
 			response.Errors = fmt.Sprint(err)
 			c.JSON(status, response)
@@ -111,8 +109,7 @@ func (w Watcher) AddWatch(c *gin.Context) {
 			c.JSON(status, response)
 			return
 		}
-		_, err = w.CreateNewAddressInfo(req.Identifier, req.Nickname)
-		if err != nil {
+		if _, err := w.CreateNewAddressInfo(req.Identifier, req.Nickname); err != nil {
 			status = http.StatusInternalServerError
 			response.Errors = fmt.Sprint(err)
 			c.JSON(status, response)
@@ -145,8 +142,7 @@ func (w Watcher) GetNickname(id string) string {
 func (w Watcher) GetBalance(c *gin.Context) {
 	body, _ := ioutil.ReadAll(c.Request.Body)
 	var req IdentifierPOST
-	err := json.Unmarshal(body, &req)
-	if err != nil {
+	if err := json.Unmarshal(body, &req); err != nil {
 		c.JSON(http.StatusInternalServerError, BalanceResponse{
 			Errors: fmt.Sprint(err),
 		})
@@ -208,8 +204,7 @@ func (w Watcher) GetWatches(c *gin.Context) {
 func (w Watcher) DeleteIdentifier(c *gin.Context) {
 	body, _ := ioutil.ReadAll(c.Request.Body)
 	var req IdentifierPOST
-	err := json.Unmarshal(body, &req)
-	if err != nil {
+	if err := json.Unmarshal(body, &req); err != nil {
 		c.JSON(http.StatusInternalServerError, BalanceResponse{
 			Errors: fmt.Sprint(err),
 		})
