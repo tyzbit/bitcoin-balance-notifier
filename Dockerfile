@@ -11,7 +11,7 @@ FROM alpine
 ENV GIN_MODE=release
 
 COPY --from=build /bitcoin-balance-notifier /
-COPY web /
+COPY web /web
 VOLUME [ "/db" ]
 
 CMD ["/bitcoin-balance-notifier"]
