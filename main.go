@@ -1,11 +1,10 @@
 package main
 
 import (
-	"os"
-	"os/signal"
 	"reflect"
-	"syscall"
+	"sync"
 
+	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/tyzbit/btcapi"
 	"gorm.io/driver/sqlite"
@@ -14,20 +13,20 @@ import (
 )
 
 type Watcher struct {
-	Addresses           []string `env:"ADDRESSES"`
-	BTCAPIEndpoint      string   `env:"BTC_RPC_API"`
 	BTCAPI              btcapi.Config
+	CancelWaitGroup     *sync.WaitGroup
+	CancelSignals       map[string]chan bool
+	DB                  *gorm.DB
+	LogConfig           logger.Interface
+	BTCAPIEndpoint      string `env:"BTC_RPC_API"`
 	CheckAllPubkeyTypes bool   `env:"CHECK_ALL_PUBKEY_TYPES"`
 	Currency            string `env:"CURRENCY"`
-	DB                  *gorm.DB
 	DBPath              string `env:"DB_PATH"`
 	DiscordWebhook      string `env:"DISCORD_WEBHOOK"`
 	SleepInterval       int    `env:"SLEEP_INTERVAL"`
-	LogConfig           logger.Interface
-	LogLevel            string   `env:"LOG_LEVEL"`
-	Lookahead           int      `env:"LOOKAHEAD"`
-	PageSize            int      `env:"PAGE_SIZE"`
-	Pubkeys             []string `env:"PUBKEYS"`
+	LogLevel            string `env:"LOG_LEVEL"`
+	Lookahead           int    `env:"LOOKAHEAD"`
+	PageSize            int    `env:"PAGE_SIZE"`
 }
 
 type DiscordPayload struct {
@@ -77,20 +76,46 @@ func main() {
 		ExplorerURL: watcher.BTCAPIEndpoint,
 	}
 
+	watcher.CancelWaitGroup = &sync.WaitGroup{}
 	// Check balance of each address
-	for _, address := range watcher.Addresses {
-		go watcher.WatchAddress(address)
+	addresses := []AddressInfo{}
+	watcher.DB.Model(&AddressInfo{}).Scan(&addresses)
+	watcher.CancelSignals = map[string]chan bool{}
+	for _, address := range addresses {
+		cancel := make(chan bool, 1)
+		watcher.CancelWaitGroup.Add(1)
+		watcher.AddCancelSignal(address.Address, cancel)
+		go watcher.WatchAddress(cancel, address.Address)
 	}
 
 	// Check balance of each key of each pubkey
-	for _, pubkey := range watcher.Pubkeys {
-		go watcher.WatchPubkey(pubkey)
+	pubkeys := []PubkeyInfo{}
+	watcher.DB.Model(&PubkeyInfo{}).Scan(&pubkeys)
+	for _, pubkey := range pubkeys {
+		cancel := make(chan bool, 1)
+		watcher.CancelWaitGroup.Add(1)
+		watcher.AddCancelSignal(pubkey.Pubkey, cancel)
+		go watcher.WatchPubkey(cancel, pubkey.Pubkey)
 	}
 
-	log.Infof("watching %d addresses and %d pubkeys", len(watcher.Addresses), len(watcher.Pubkeys))
+	log.Infof("watching %d addresses and %d pubkeys", len(addresses), len(pubkeys))
 
-	// Listen for signals from the OS
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	<-sc
+	r := gin.Default()
+
+	// Backend
+	r.POST("/balance", watcher.GetBalance)
+	r.POST("/watch", watcher.AddWatch)
+	r.GET("/balances", watcher.GetBalances)
+	r.GET("/watches", watcher.GetWatches)
+	r.DELETE("/identifier", watcher.DeleteIdentifier)
+
+	// Frontend
+	r.LoadHTMLGlob("web/templates/**/*")
+	r.Static("/static", "web/static")
+	r.GET("/", watcher.Home)
+
+	err = r.Run(":3000")
+	if err != nil {
+		log.Fatal("could not start: ", err)
+	}
 }

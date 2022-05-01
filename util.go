@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"text/template"
 
@@ -22,7 +21,7 @@ import (
 type Info interface {
 	GetIdentifier() string
 	GetNickname() string
-	Update(w Watcher) error
+	Update(Watcher) error
 }
 
 // UpdateInfo calls Update() for the provided Info interface
@@ -34,14 +33,20 @@ func (w Watcher) UpdateInfo(i Info) {
 	}
 }
 
-// getTagValue looks up the tag for a given field of the specified type.
-// Be advised, if the tag can't be found, it returns an empty string.
-func getTagValue(i interface{}, field string, tag string) string {
-	r, ok := reflect.TypeOf(i).FieldByName(field)
-	if !ok {
-		return ""
+// AddCancelSignal adds a cancel channel to w.CancelSignals
+func (w Watcher) AddCancelSignal(i string, c chan bool) {
+	w.CancelSignals[i] = c
+	w.CancelWaitGroup.Done()
+}
+
+// DeleteCancelSignal deletes the cancel channel on w.CancelSignals
+func (w Watcher) DeleteCancelSignal(i string) {
+	// Only send to the channel if it's open and buffered
+	if w.CancelSignals[i] != make(chan bool, 1) {
+		w.CancelSignals[i] <- true
 	}
-	return r.Tag.Get(tag)
+	delete(w.CancelSignals, i)
+	w.CancelWaitGroup.Done()
 }
 
 // InitLogging sets up logging
@@ -80,17 +85,6 @@ func InitLogging() {
 // FillDefaults sets a Watcher to default
 // values defined in the constants
 func (w Watcher) FillDefaults() {
-	// Exit if we dont have an address or a pubkey plus a Discord webhook
-	if (watcher.Addresses == nil && watcher.Pubkeys == nil) || watcher.DiscordWebhook == "" {
-		log.Fatalf("You must provide at least one "+
-			"address to watch (%s environment variable) or one "+
-			"pubkey to watch (%s environment variable) and a"+
-			"Discord webhook (%s environment variable)",
-			getTagValue(watcher, "Addresses", "env"),
-			getTagValue(watcher, "Pubkeys", "env"),
-			getTagValue(watcher, "DiscordWebhook", "env"))
-	}
-
 	// Set unitialized values to preset defaults
 	if w.BTCAPIEndpoint == "" {
 		watcher.BTCAPIEndpoint = DefaultApi
