@@ -89,7 +89,7 @@ func (w Watcher) FillDefaults() {
 		watcher.Port = "80"
 	}
 	if w.Currency == "" {
-		watcher.Currency = "USD"
+		watcher.Currency = CurrencyUSD
 	}
 
 	// Set up DB path

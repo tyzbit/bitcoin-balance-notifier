@@ -2,31 +2,42 @@ package main
 
 import (
 	"fmt"
-	"strings"
+	"math"
 )
 
-// ConvertBalance takes a balance in satoshis and returns the equivalent
-// balance in the currency specified by Watcher.Currency
-func (w Watcher) ConvertBalance(balanceSat int) (float64, error) {
+const (
+	CurrencyUSD = "USD"
+	CurrencyEUR = "EUR"
+	CurrencyGBP = "GBP"
+	CurrencyXAU = "XAU"
+)
+
+// ConvertBalance takes a currency and one or more balances in satoshis and
+// returns the equivalent balance(s) in the currency specified with
+// two digits of precision.
+func (w Watcher) ConvertBalance(currency string, balancesSat ...int) (bs []string, err error) {
 	price, err := w.BTCAPI.Price()
 	if err != nil {
-		return 0.0, fmt.Errorf("error calling btcapi: %v", err)
+		return nil, fmt.Errorf("error calling btcapi: %v", err)
 	}
 
-	balanceFiat := 0.0
-	currency := strings.ToUpper(w.Currency)
-	bitcoinBalance := float64(balanceSat) / float64(SatsPerBitcoin)
-	switch currency {
-	case "USD":
-		balanceFiat = price.USD * bitcoinBalance
-	case "EUR":
-		balanceFiat = price.EUR * bitcoinBalance
-	case "GBP":
-		balanceFiat = price.GBP * bitcoinBalance
-	case "XAU":
-		balanceFiat = price.XAU * bitcoinBalance
-	default:
-		balanceFiat = price.USD * bitcoinBalance
+	for _, b := range balancesSat {	
+		balanceCurrency := 0.0
+		bitcoinBalance := float64(b) / float64(SatsPerBitcoin)
+		switch currency {
+		case CurrencyUSD:
+			balanceCurrency = price.USD * bitcoinBalance
+		case CurrencyEUR:
+			balanceCurrency = price.EUR * bitcoinBalance
+		case CurrencyGBP:
+			balanceCurrency = price.GBP * bitcoinBalance
+		case CurrencyXAU:
+			balanceCurrency = price.XAU * bitcoinBalance
+		default:
+			balanceCurrency = price.USD * bitcoinBalance
+		}
+		bs = append(bs, fmt.Sprint(math.Round(balanceCurrency*100)/100))
 	}
-	return balanceFiat, nil
+	// Round with two digits of precision
+	return bs, nil
 }

@@ -2,14 +2,13 @@ package main
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 )
 
 // AddressInfo represents information about a given address.
+// AddressInfo implements the Info interface
 type AddressInfo struct {
 	Address                 string `gorm:"primaryKey"`
 	Nickname                string
@@ -82,16 +81,17 @@ main:
 				log.Errorf("error calling btcapi: %v", err)
 			}
 
-			currencyBalance, err := w.ConvertBalance(addressSummary.TXHistory.BalanceSat)
-			if err != nil {
+			currencyBalance, err := w.ConvertBalance(oldAddressInfo.Currency, addressSummary.TXHistory.BalanceSat)
+			if err != nil || currencyBalance == nil {
 				log.Errorf("unable to convert balance of %d to %s, err: %v", addressSummary.TXHistory.BalanceSat, w.Currency, err)
+				currencyBalance[0] = "0.00"
 			}
 			addressInfo := AddressInfo{
 				Address:                 address,
 				Nickname:                nickname,
 				BalanceSat:              addressSummary.TXHistory.BalanceSat,
-				BalanceCurrency:         strconv.FormatFloat(currencyBalance, 'f', 2, 64),
-				Currency:                strings.ToUpper(w.Currency),
+				BalanceCurrency:         currencyBalance[0],
+				Currency:                oldAddressInfo.Currency,
 				PreviousBalanceSat:      oldAddressInfo.BalanceSat,
 				PreviousBalanceCurrency: oldAddressInfo.BalanceCurrency,
 				TXCount:                 addressSummary.TXHistory.TXCount,
@@ -123,10 +123,10 @@ func (w Watcher) CreateNewAddressInfo(address string, nickname string) (AddressI
 		Address:                 address,
 		Nickname:                nickname,
 		BalanceSat:              0,
-		BalanceCurrency:         "0.0",
+		BalanceCurrency:         "0.00",
 		Currency:                w.Currency,
 		PreviousBalanceSat:      0,
-		PreviousBalanceCurrency: "0.0",
+		PreviousBalanceCurrency: "0.00",
 		TXCount:                 0,
 	}
 
@@ -137,12 +137,25 @@ func (w Watcher) CreateNewAddressInfo(address string, nickname string) (AddressI
 	return addressInfo, nil
 }
 
-// Gets an AddressInfo object from the database with an address
-func (w Watcher) GetAddressInfo(address string) (addressInfo AddressInfo) {
+// Gets an AddressInfo object from the database identified by an address
+func (w Watcher) GetAddressInfo(address string) (a AddressInfo) {
 	w.DB.Model(&AddressInfo{}).
 		Where(&AddressInfo{Address: address}).
-		Scan(&addressInfo)
-	return addressInfo
+		Scan(&a)
+	// Update the object with current exchange rates
+	if (a != AddressInfo{}) {
+		var err error
+		bs, err := w.ConvertBalance(a.Currency, a.PreviousBalanceSat, a.BalanceSat)
+		if err != nil || bs == nil {
+			log.Errorf("error converting balance, err: %v", err)
+			return a
+		}
+		a.PreviousBalanceCurrency = bs[0]
+		a.BalanceCurrency = bs[1]
+		// Update the currency data in the database
+		w.UpdateInfo(a)
+	}
+	return a
 }
 
 // Deletes an AddressInfo object from the database with an address

@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -11,6 +9,7 @@ import (
 )
 
 // PubkeyInfo represents information about a given pubkey.
+// Pubkey implements the Info interface
 type PubkeyInfo struct {
 	Pubkey                  string `gorm:"primaryKey"`
 	Nickname                string
@@ -154,17 +153,18 @@ main:
 				totalTxCount = totalTxCount + totalPubkeyTxCount
 			}
 
-			currencyBalance, err := w.ConvertBalance(totalBalance)
-			if err != nil {
+			currencyBalance, err := w.ConvertBalance(oldPubkeyInfo.Currency, totalBalance)
+			if err != nil || currencyBalance == nil {
 				log.Errorf("unable to convert balance of %d to %s, err: %v", totalBalance, w.Currency, err)
+				currencyBalance[0] = "0.00"
 			}
 			pubkeyInfo := PubkeyInfo{
 				Pubkey:                  pubKeys[0],
 				Nickname:                nickname,
 				BalanceSat:              totalBalance,
+				BalanceCurrency:         currencyBalance[0],
+				Currency:                oldPubkeyInfo.Currency,
 				PreviousBalanceSat:      oldPubkeyInfo.BalanceSat,
-				Currency:                strings.ToUpper(w.Currency),
-				BalanceCurrency:         strconv.FormatFloat(currencyBalance, 'f', 2, 64),
 				PreviousBalanceCurrency: oldPubkeyInfo.BalanceCurrency,
 				TXCount:                 totalTxCount,
 			}
@@ -194,10 +194,10 @@ func (w Watcher) CreateNewPubkeyInfo(pubkey string, nickname string) (PubkeyInfo
 		Pubkey:                  pubkey,
 		Nickname:                nickname,
 		BalanceSat:              0,
-		BalanceCurrency:         "0.0",
+		BalanceCurrency:         "0.00",
 		Currency:                w.Currency,
 		PreviousBalanceSat:      0,
-		PreviousBalanceCurrency: "0.0",
+		PreviousBalanceCurrency: "0.00",
 		TXCount:                 0,
 	}
 	tx := w.DB.Model(&PubkeyInfo{}).Create(&pubkeyInfo)
@@ -219,12 +219,24 @@ func (w Watcher) UpdatePubkeysTotal(address string, totalPubkeyBalance *int, tot
 	return addressSummary, nil
 }
 
-// GetPubkeyInfo gets a PubkeyInfo object from the database with a pubkey
-func (w Watcher) GetPubkeyInfo(pubkey string) (pubkeyInfo PubkeyInfo) {
+// GetPubkeyInfo gets a PubkeyInfo object from the database identified by a pubkey
+func (w Watcher) GetPubkeyInfo(pubkey string) (p PubkeyInfo) {
 	w.DB.Model(&PubkeyInfo{}).
 		Where(&PubkeyInfo{Pubkey: pubkey}).
-		Scan(&pubkeyInfo)
-	return pubkeyInfo
+		Scan(&p)
+	// Update the object with current exchange rates
+	if (p != PubkeyInfo{}) {
+		bs, err := w.ConvertBalance(p.Currency, p.PreviousBalanceSat, p.BalanceSat)
+		if err != nil || bs == nil {
+			log.Errorf("error converting balance, err: %v", err)
+			return p
+		}
+		p.PreviousBalanceCurrency = bs[0]
+		p.BalanceCurrency = bs[1]
+		// Update the currency data in the database
+		w.UpdateInfo(p)
+	}
+	return p
 }
 
 // DeletePubkeyInfo deletes a PubkeyInfo object from the database with a pubkey
