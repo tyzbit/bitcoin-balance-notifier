@@ -2,7 +2,6 @@ package main
 
 import (
 	"embed"
-	"fmt"
 	"reflect"
 	"sync"
 
@@ -85,7 +84,7 @@ func main() {
 	InitFrontend(r)
 	InitBackend(r)
 
-	if err := r.Run(":" + fmt.Sprintf(watcher.Port)); err != nil {
+	if err := r.Run(":"+watcher.Port); err != nil {
 		log.Fatal("could not start: ", err)
 	}
 }
