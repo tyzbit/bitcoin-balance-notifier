@@ -1,7 +1,4 @@
 $(document).ready(function () {
-  function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
   function refreshAddresses() {
     // Populate addresses
     $.get("/balances", function (data) {
