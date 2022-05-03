@@ -51,7 +51,7 @@ func (w *Watcher) InitLogging() {
 }
 
 func GinJSONFormatter(param gin.LogFormatterParams) string {
-	jsonFormat := `{"time":"%s","clientip":"%s","method":"%s","uri":"%s","status":%3d,"latency":"%v","message":"%s","host":"%s","useragent":"%s","proto","%s","error_msg":"%s","size":%d}` + "\n"
+	jsonFormat := `{"time":"%s","clientip":"%s","method":"%s","uri":"%s","status":%3d,"latency":"%v","message":"%s","host":"%s","useragent":"%s","proto":"%s","error_msg":"%s","size":%d}` + "\n"
 	return fmt.Sprintf(jsonFormat,
 		param.TimeStamp.Format(TimeFormatter),
 		param.ClientIP,
