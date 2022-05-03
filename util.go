@@ -103,6 +103,8 @@ func (w Watcher) FillDefaults() {
 	}
 }
 
+// StartWatches starts goroutines for watching all of the known
+// addresses in the database.
 func StartWatches() {
 	watcher.CancelWaitGroup = &sync.WaitGroup{}
 	// Check balance of each address
