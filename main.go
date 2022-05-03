@@ -19,6 +19,10 @@ type Watcher struct {
 	CancelSignals       map[string]chan bool
 	DB                  *gorm.DB
 	LogConfig           logger.Interface
+	Config
+}
+
+type Config struct {
 	BTCAPIEndpoint      string `env:"BTC_RPC_API"`
 	CheckAllPubkeyTypes bool   `env:"CHECK_ALL_PUBKEY_TYPES"`
 	Currency            string `env:"CURRENCY"`
