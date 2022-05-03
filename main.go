@@ -19,6 +19,8 @@ type Watcher struct {
 	CancelSignals       map[string]chan bool
 	DB                  *gorm.DB
 	LogConfig           logger.Interface
+	// Config is embedded into Watcher at the top level, except
+	// it needs to be explicitly called when using pointers.
 	Config
 }
 
@@ -59,7 +61,7 @@ var (
 )
 
 func init() {
-	InitLogging()
+	watcher.InitLogging()
 
 	// Set defaults and throw errors if necessary values aren't set
 	watcher.FillDefaults()
@@ -83,8 +85,9 @@ func main() {
 		ExplorerURL: watcher.BTCAPIEndpoint,
 	}
 
-	StartWatches()
-	r := gin.Default()
+	watcher.StartWatches()
+	r := gin.New()
+	r.Use(gin.LoggerWithFormatter(GinJSONFormatter))
 	InitFrontend(r)
 	InitBackend(r)
 
