@@ -21,7 +21,7 @@ type Watcher struct {
 	LogConfig           logger.Interface
 	// Config is embedded into Watcher at the top level, except
 	// it needs to be explicitly called when using pointers.
-	Config
+	Config Config
 }
 
 type Config struct {
@@ -68,7 +68,7 @@ func init() {
 }
 
 func main() {
-	db, err := gorm.Open(sqlite.Open(watcher.DBPath), &gorm.Config{Logger: watcher.LogConfig})
+	db, err := gorm.Open(sqlite.Open(watcher.Config.DBPath), &gorm.Config{Logger: watcher.LogConfig})
 	if err != nil {
 		log.Fatal("unable to open db: ", err)
 	}
@@ -82,7 +82,7 @@ func main() {
 
 	// Set up BTC-RPC
 	watcher.BTCAPI = btcapi.Config{
-		ExplorerURL: watcher.BTCAPIEndpoint,
+		ExplorerURL: watcher.Config.BTCAPIEndpoint,
 	}
 
 	watcher.StartWatches()
@@ -91,7 +91,7 @@ func main() {
 	InitFrontend(r)
 	InitBackend(r)
 
-	if err := r.Run(":"+watcher.Port); err != nil {
+	if err := r.Run(":"+watcher.Config.Port); err != nil {
 		log.Fatal("could not start: ", err)
 	}
 }

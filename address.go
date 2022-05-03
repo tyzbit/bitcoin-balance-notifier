@@ -83,7 +83,7 @@ main:
 
 			currencyBalance, err := w.ConvertBalance(oldAddressInfo.Currency, addressSummary.TXHistory.BalanceSat)
 			if err != nil || currencyBalance == nil {
-				log.Errorf("unable to convert balance of %d to %s, err: %v", addressSummary.TXHistory.BalanceSat, w.Currency, err)
+				log.Errorf("unable to convert balance of %d to %s, err: %v", addressSummary.TXHistory.BalanceSat, w.Config.Currency, err)
 				currencyBalance[0] = "0.00"
 			}
 			addressInfo := AddressInfo{
@@ -103,7 +103,7 @@ main:
 				w.SendNotification(addressInfo, addressMessageTemplate)
 			}
 			// Check every second for a stop signal
-			for i := 0; i < w.SleepInterval; i++ {
+			for i := 0; i < w.Config.SleepInterval; i++ {
 				select {
 				case <-stop:
 					break main
@@ -124,7 +124,7 @@ func (w Watcher) CreateNewAddressInfo(address string, nickname string) (AddressI
 		Nickname:                nickname,
 		BalanceSat:              0,
 		BalanceCurrency:         "0.00",
-		Currency:                w.Currency,
+		Currency:                w.Config.Currency,
 		PreviousBalanceSat:      0,
 		PreviousBalanceCurrency: "0.00",
 		TXCount:                 0,

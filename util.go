@@ -53,17 +53,17 @@ func (w *Watcher) InitLogging() {
 	// Info level by default
 	LogLevelSelection := log.InfoLevel
 	switch {
-	case strings.EqualFold(w.LogLevel, "trace"):
+	case strings.EqualFold(w.Config.LogLevel, "trace"):
 		LogLevelSelection = log.TraceLevel
 		log.SetReportCaller(true)
-	case strings.EqualFold(w.LogLevel, "debug"):
+	case strings.EqualFold(w.Config.LogLevel, "debug"):
 		LogLevelSelection = log.DebugLevel
 		log.SetReportCaller(true)
-	case strings.EqualFold(w.LogLevel, "info"):
+	case strings.EqualFold(w.Config.LogLevel, "info"):
 		LogLevelSelection = log.InfoLevel
-	case strings.EqualFold(w.LogLevel, "warn"):
+	case strings.EqualFold(w.Config.LogLevel, "warn"):
 		LogLevelSelection = log.WarnLevel
-	case strings.EqualFold(w.LogLevel, "error"):
+	case strings.EqualFold(w.Config.LogLevel, "error"):
 		LogLevelSelection = log.ErrorLevel
 	}
 	log.SetLevel(LogLevelSelection)
@@ -77,7 +77,7 @@ func (w *Watcher) InitLogging() {
 func GinJSONFormatter(param gin.LogFormatterParams) string {
 	jsonFormat := `{"level":"%s","time":"%s","clientip":"%s","method":"%s","uri":"%s","status":%3d,"latency":"%v","message":"%s","host":"%s","useragent":"%s","proto","%s","error_msg":"%s","size":%d}` + "\n"
 	return fmt.Sprintf(jsonFormat,
-		watcher.LogLevel,
+		watcher.Config.LogLevel,
 		param.TimeStamp.Format(TimeFormatter),
 		param.ClientIP,
 		param.Method,
@@ -97,35 +97,35 @@ func GinJSONFormatter(param gin.LogFormatterParams) string {
 // values defined in the constants
 func (w *Watcher) FillDefaults() {
 	// Set unitialized values to preset defaults
-	if w.BTCAPIEndpoint == "" {
-		w.BTCAPIEndpoint = DefaultApi
+	if w.Config.BTCAPIEndpoint == "" {
+		w.Config.BTCAPIEndpoint = DefaultApi
 	}
-	if w.SleepInterval == 0 {
-		w.SleepInterval = DefaultSleepInterval
+	if w.Config.SleepInterval == 0 {
+		w.Config.SleepInterval = DefaultSleepInterval
 	}
-	if w.Lookahead == 0 {
-		w.Lookahead = DefaultLookahead
+	if w.Config.Lookahead == 0 {
+		w.Config.Lookahead = DefaultLookahead
 	}
-	if w.PageSize == 0 {
-		w.PageSize = DefaultPageSize
+	if w.Config.PageSize == 0 {
+		w.Config.PageSize = DefaultPageSize
 	}
-	if w.DBPath == "" {
-		w.DBPath = DefaultDBPath
+	if w.Config.DBPath == "" {
+		w.Config.DBPath = DefaultDBPath
 	}
-	if w.Port == "" {
-		w.Port = "80"
+	if w.Config.Port == "" {
+		w.Config.Port = "80"
 	}
-	if w.Currency == "" {
-		w.Currency = CurrencyUSD
+	if w.Config.Currency == "" {
+		w.Config.Currency = CurrencyUSD
 	}
 
 	// Set up DB path
 	// Create the folder path if it doesn't exist
-	if _, err := os.Stat(w.DBPath); errors.Is(err, fs.ErrNotExist) {
-		dirPath := filepath.Dir(w.DBPath)
+	if _, err := os.Stat(w.Config.DBPath); errors.Is(err, fs.ErrNotExist) {
+		dirPath := filepath.Dir(w.Config.DBPath)
 		if err := os.MkdirAll(dirPath, 0660); err != nil {
 			log.Warn("unable to make directory path ", dirPath, " err: ", err)
-			w.DBPath = "./local.db"
+			w.Config.DBPath = "./local.db"
 		}
 	}
 }
@@ -203,7 +203,7 @@ func (w Watcher) SendNotification(i interface{}, mt string) {
 	}
 
 	client := http.Client{}
-	resp, respErr := client.Post(w.DiscordWebhook, "application/json", &m)
+	resp, respErr := client.Post(w.Config.DiscordWebhook, "application/json", &m)
 	if respErr != nil || resp.StatusCode != 204 {
 		log.Errorf("error calling Discord API (%s): %v", resp.Status, respErr)
 		return
