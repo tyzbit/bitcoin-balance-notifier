@@ -29,17 +29,17 @@ func (w *Watcher) InitLogging() {
 	// Info level by default
 	LogLevelSelection := log.InfoLevel
 	switch {
-	case strings.EqualFold(w.Config.LogLevel, "trace"):
+	case strings.EqualFold(w.LogLevel, "trace"):
 		LogLevelSelection = log.TraceLevel
 		log.SetReportCaller(true)
-	case strings.EqualFold(w.Config.LogLevel, "debug"):
+	case strings.EqualFold(w.LogLevel, "debug"):
 		LogLevelSelection = log.DebugLevel
 		log.SetReportCaller(true)
-	case strings.EqualFold(w.Config.LogLevel, "info"):
+	case strings.EqualFold(w.LogLevel, "info"):
 		LogLevelSelection = log.InfoLevel
-	case strings.EqualFold(w.Config.LogLevel, "warn"):
+	case strings.EqualFold(w.LogLevel, "warn"):
 		LogLevelSelection = log.WarnLevel
-	case strings.EqualFold(w.Config.LogLevel, "error"):
+	case strings.EqualFold(w.LogLevel, "error"):
 		LogLevelSelection = log.ErrorLevel
 	}
 	log.SetLevel(LogLevelSelection)
@@ -72,38 +72,38 @@ func GinJSONFormatter(param gin.LogFormatterParams) string {
 // values defined in the constants
 func (w *Watcher) FillDefaults() {
 	// Set unitialized values to preset defaults
-	if w.Config.BTCAPIEndpoint == "" {
-		w.Config.BTCAPIEndpoint = DefaultApi
+	if w.BTCAPIEndpoint == "" {
+		w.BTCAPIEndpoint = DefaultApi
 	}
-	if w.Config.LogLevel == "" {
-		w.Config.LogLevel = "info"
+	if w.LogLevel == "" {
+		w.LogLevel = "info"
 	}
-	if w.Config.SleepInterval == 0 {
-		w.Config.SleepInterval = DefaultSleepInterval
+	if w.SleepInterval == 0 {
+		w.SleepInterval = DefaultSleepInterval
 	}
-	if w.Config.Lookahead == 0 {
-		w.Config.Lookahead = DefaultLookahead
+	if w.Lookahead == 0 {
+		w.Lookahead = DefaultLookahead
 	}
-	if w.Config.PageSize == 0 {
-		w.Config.PageSize = DefaultPageSize
+	if w.PageSize == 0 {
+		w.PageSize = DefaultPageSize
 	}
-	if w.Config.DBPath == "" {
-		w.Config.DBPath = DefaultDBPath
+	if w.DBPath == "" {
+		w.DBPath = DefaultDBPath
 	}
-	if w.Config.Port == "" {
-		w.Config.Port = "80"
+	if w.Port == "" {
+		w.Port = "80"
 	}
-	if w.Config.Currency == "" {
-		w.Config.Currency = CurrencyUSD
+	if w.Currency == "" {
+		w.Currency = CurrencyUSD
 	}
 
 	// Set up DB path
 	// Create the folder path if it doesn't exist
-	if _, err := os.Stat(w.Config.DBPath); errors.Is(err, fs.ErrNotExist) {
-		dirPath := filepath.Dir(w.Config.DBPath)
+	if _, err := os.Stat(w.DBPath); errors.Is(err, fs.ErrNotExist) {
+		dirPath := filepath.Dir(w.DBPath)
 		if err := os.MkdirAll(dirPath, 0660); err != nil {
 			log.Warn("unable to make directory path ", dirPath, " err: ", err)
-			w.Config.DBPath = "./local.db"
+			w.DBPath = "./local.db"
 		}
 	}
 }

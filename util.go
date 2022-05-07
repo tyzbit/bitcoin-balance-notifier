@@ -73,7 +73,7 @@ func (w Watcher) SendNotification(i interface{}, mt string) {
 	}
 
 	client := http.Client{}
-	resp, respErr := client.Post(w.Config.DiscordWebhook, "application/json", &m)
+	resp, respErr := client.Post(w.DiscordWebhook, "application/json", &m)
 	if respErr != nil || resp.StatusCode != 204 {
 		log.Errorf("error calling Discord API (%s): %v", resp.Status, respErr)
 		return

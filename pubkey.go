@@ -85,7 +85,7 @@ main:
 				continue
 			}
 
-			if w.Config.CheckAllPubkeyTypes {
+			if w.CheckAllPubkeyTypes {
 				for _, pubkeyType := range pubkeySummary.RelatedKeys {
 					pubKeys = append(pubKeys, pubkeyType.Key)
 				}
@@ -100,8 +100,8 @@ main:
 				totalPubkeyBalance, totalPubkeyTxCount, NoTXCount := 0, 0, 0
 
 			pubkey:
-				for offset := 0; 0 == 0; offset = offset + w.Config.PageSize {
-					pubKeyPage, err := w.BTCAPI.ExtendedPublicKeyDetailsPage(pubkey, w.Config.PageSize, offset)
+				for offset := 0; 0 == 0; offset = offset + w.PageSize {
+					pubKeyPage, err := w.BTCAPI.ExtendedPublicKeyDetailsPage(pubkey, w.PageSize, offset)
 					if err != nil {
 						log.Errorf("error calling btcapi: %v", err)
 					}
@@ -129,7 +129,7 @@ main:
 								continue
 							}
 							if pubkeyTxCount == addressSummary.TXHistory.TXCount {
-								if NoTXCount > w.Config.Lookahead*2 {
+								if NoTXCount > w.Lookahead*2 {
 									// Stop paging, we haven't had an address with
 									// transactions in w.Lookahead * 2 addresses.
 									// (we multiply by 2 because we're checking
@@ -155,7 +155,7 @@ main:
 
 			currencyBalance, err := w.ConvertBalance(oldPubkeyInfo.Currency, totalBalance)
 			if err != nil || currencyBalance == nil {
-				log.Errorf("unable to convert balance of %d to %s, err: %v", totalBalance, w.Config.Currency, err)
+				log.Errorf("unable to convert balance of %d to %s, err: %v", totalBalance, w.Currency, err)
 				currencyBalance[0] = "0.00"
 			}
 			pubkeyInfo := PubkeyInfo{
@@ -174,7 +174,7 @@ main:
 				w.SendNotification(pubkeyInfo, pubkeyMessageTemplate)
 			}
 			// Check every second for a stop signal
-			for i := 0; i < w.Config.SleepInterval; i++ {
+			for i := 0; i < w.SleepInterval; i++ {
 				select {
 				case <-stop:
 					break main
@@ -195,7 +195,7 @@ func (w Watcher) CreateNewPubkeyInfo(pubkey string, nickname string) (PubkeyInfo
 		Nickname:                nickname,
 		BalanceSat:              0,
 		BalanceCurrency:         "0.00",
-		Currency:                w.Config.Currency,
+		Currency:                w.Currency,
 		PreviousBalanceSat:      0,
 		PreviousBalanceCurrency: "0.00",
 		TXCount:                 0,

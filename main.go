@@ -19,9 +19,7 @@ type Watcher struct {
 	CancelSignals       map[string]chan bool
 	DB                  *gorm.DB
 	LogConfig           logger.Interface
-	// Config is embedded into Watcher at the top level, except
-	// it needs to be explicitly called when using pointers.
-	Config Config
+	Config
 }
 
 type Config struct {
