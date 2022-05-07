@@ -24,6 +24,7 @@ func InitFrontend(r *gin.Engine) {
 		log.Panic(err)
 	}
 	r.StaticFS("/static", http.FS(staticSubPath))
+	r.GET("/", watcher.Home)
 }
 
 func InitBackend(r *gin.Engine) {
@@ -32,5 +33,4 @@ func InitBackend(r *gin.Engine) {
 	r.GET("/balances", watcher.GetBalances)
 	r.GET("/watches", watcher.GetWatches)
 	r.DELETE("/identifier", watcher.DeleteIdentifier)
-	r.GET("/", watcher.Home)
 }
