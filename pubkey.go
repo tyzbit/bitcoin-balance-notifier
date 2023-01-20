@@ -169,7 +169,7 @@ main:
 				TXCount:                 totalTxCount,
 			}
 			if pubkeyInfo.BalanceSat != oldPubkeyInfo.BalanceSat {
-				log.Debugf("\"%s\" (%s) balance updated from %d to %d sats", nickname, pubKeys[0], oldPubkeyInfo.BalanceSat, pubkeyInfo.BalanceSat)
+				log.Infof("\"%s\" (%s) balance updated from %d to %d sats", nickname, pubKeys[0], oldPubkeyInfo.BalanceSat, pubkeyInfo.BalanceSat)
 				w.UpdateInfo(pubkeyInfo)
 				w.SendNotification(pubkeyInfo, pubkeyMessageTemplate)
 			}
